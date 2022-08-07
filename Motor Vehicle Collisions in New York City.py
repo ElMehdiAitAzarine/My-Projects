@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-
+import pydeck as pdk
 DATA_URL = (
 "C:/Users/hp/Desktop/Motor_Vehicle_Collisions_-_Crashes.csv"
 )
@@ -14,7 +14,7 @@ def load_data(nrows):
     data.dropna(subset=['LATITUDE','LONGITUDE'],inplace=True)
     lowercase = lambda x: str(x).lower()
     data.rename(lowercase, axis='columns',inplace=True)
-    data.rename(columns={'crash_date_crash_time' : 'date/time'},inplace=True)
+    data.rename(columns={'crash_date''crash_time' : 'date/time'},inplace=True)
     data.drop(data.loc[data['latitude']==int(0.0000)].index, inplace=True)
     return data
 
@@ -26,14 +26,37 @@ st.map(data.query('nopi >= @injured_peaple')[["latitude","longitude"]].dropna(ho
 data.rename(columns={'nopi' : 'number of persons injured'},inplace=True)
 
 st.header('How Many Collision Occur During A Given Time Of Day ?')
-hour = st.selectbox("Hour to look at", range(0,24),1)
+hour = st.slider("Hour to look at",0,23)
 data = data[data['crash date_crash time'].dt.hour == hour]
 
+st.markdown("Vehicule Collisions between %i:00 and %i:00" % (hour, (hour+1)%24))
+midpoint = (np.average(data['latitude']),np.average(data['longitude']))
+st.write(pdk.Deck(
+    map_style="mapbox://styles/mapbox/light-v9",
+    initial_view_state={
+          "latitude": midpoint[0],
+          "longitude": midpoint[1],
+          "zoom" : 11,
+          "pitch":50,
 
-
+        },
+        layers=[
+            pdk.Layer(
+                "HexagonLayer",
+                data = data[['crash date_crash time','latitude','longitude']],
+                get_position=['longitude','latitude'],
+                radius=100,
+                extruded=True,
+                pickable=True,
+                elevation_scale=4,
+                elevation_range=[0,1000],
+        ),
+            ]
+    ))
 
 
 if st.checkbox("Show Raw Data",True):
   st.subheader('Raw Data')
   st.write(data)
 
+ 
