@@ -25,7 +25,7 @@ injured_peaple = st.slider("Number of Persons Injured In Vehicule Collision",0,2
 st.map(data.query('nopi >= @injured_peaple')[["latitude","longitude"]].dropna(how="any"))
 data.rename(columns={'nopi' : 'number of persons injured'},inplace=True)
 
-st.header('How Many Collision Occur During A Given Time Of Day ?')
+st.header('How Many Collision Occur During a Given Time Of Day ?')
 hour = st.slider("Hour to look at",0,23)
 data = data[data['crash date_crash time'].dt.hour == hour]
 
@@ -51,9 +51,17 @@ st.write(pdk.Deck(
                 elevation_scale=4,
                 elevation_range=[0,1000],
         ),
-            ]
+            ],
     ))
 
+st.subheader("Breakdown by minute between %i:00 and %i:00" % (hour + 1) %24)
+filtered = data[
+    (data['date/time'].dt.hour >= hour) & (data[date/time].dt.hour<(hour +1))
+    ]
+hist = np.histogram(filtered['date/time'].dt.minute,bins=60)
+chart_data = pd.DataFrame({'minute':range(60), 'crashes':hist})
+fig = pd.bar(chart_data, x='minute', y='crashes', hover_data=['minute','crashes'], height=400)
+st.write(fig)
 
 if st.checkbox("Show Raw Data",True):
   st.subheader('Raw Data')
