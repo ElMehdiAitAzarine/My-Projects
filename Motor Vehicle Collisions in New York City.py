@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import pydeck as pdk
 DATA_URL = (
-"C:/Users/hp/Desktop/Motor_Vehicle_Collisions_-_Crashes.csv"
+"https://media.githubusercontent.com/media/chairielazizi/streamlit-collision/master/Motor_Vehicle_Collisions_-_Crashes.csv"
 )
 st.title("Motor Vehicle Collisions in New York City")
 st.markdown("this application is a Streamlit dashbord that can be used"
